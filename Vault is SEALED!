@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault 74034 &mdash; A Gringotts Division Escape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --maroon: #5c0f16;
+    --maroon-deep: #3c0a0f;
+    --gold: #c9a227;
+    --gold-bright: #e6c65c;
+    --parchment: #f3e9d2;
+    --parchment-dark: #e6d8b8;
+    --ink: #2a1f16;
+    --bronze: #8a5a2b;
+    --success: #3d6b3f;
+    --danger: #8c2f22;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse at top, #7a1620 0%, var(--maroon-deep) 55%, #200608 100%);
+    background-attachment: fixed;
+    font-family: 'EB Garamond', serif;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    text-align: center;
+    padding: 56px 20px 40px;
+    color: var(--parchment);
+  }
+  .hero .eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    letter-spacing: 0.18em;
+    color: var(--gold-bright);
+    margin: 0 0 10px;
+  }
+  .hero h1 {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-size: clamp(32px, 6vw, 54px);
+    margin: 0 0 14px;
+    color: var(--gold-bright);
+    text-shadow: 0 2px 0 #000, 0 0 24px rgba(230,198,92,0.35);
+    line-height: 1.1;
+  }
+  .hero p.lede {
+    font-size: 19px;
+    max-width: 540px;
+    margin: 0 auto 30px;
+    color: #f0e6d0;
+  }
+
+  /* ---------- LOCK DIAL ---------- */
+  .dial {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto 8px;
+  }
+  .tumbler {
+    width: 52px; height: 64px;
+    background: linear-gradient(180deg, #2b2019, #16100b);
+    border: 2px solid var(--bronze);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: #6b5842;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+    transition: all 0.5s ease;
+  }
+  .tumbler.filled {
+    color: var(--gold-bright);
+    border-color: var(--gold-bright);
+    background: linear-gradient(180deg, #3c2e10, #1c1508);
+    box-shadow: 0 0 14px rgba(230,198,92,0.55), inset 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .dial-caption {
+    text-align: center;
+    font-size: 14px;
+    color: #cbb98a;
+    margin-bottom: 36px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- CHAMBER CARDS ---------- */
+  .chamber {
+    position: relative;
+    background: var(--parchment);
+    border: 1px solid #b89a5e;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    padding: 30px 32px 28px;
+    margin-bottom: 28px;
+  }
+  .chamber::before {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1px solid rgba(90,60,20,0.35);
+    pointer-events: none;
+  }
+  .chamber.solved { border-color: var(--gold); }
+  .chamber.solved::after {
+    content: "\2713 CHAMBER SEALED";
+    position: absolute; top: -13px; right: 24px;
+    background: var(--gold);
+    color: #2a1f16;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .chamber-num {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    color: var(--bronze);
+    margin: 0 0 4px;
+  }
+  .chamber h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 25px;
+    margin: 0 0 14px;
+    color: var(--maroon);
+  }
+  .chamber .story { font-style: italic; color: #4a3a26; margin-bottom: 14px; }
+  .chamber .problem {
+    background: rgba(90,60,20,0.06);
+    border-left: 4px solid var(--maroon);
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 17px;
+  }
+  .problem .algo {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    white-space: pre;
+    margin-top: 10px;
+    color: var(--maroon-deep);
+  }
+  .answer-row {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 8px;
+  }
+  .answer-row input[type="text"] {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    padding: 8px 12px;
+    border: 2px solid var(--bronze);
+    background: #fffdf6;
+    width: 140px;
+  }
+  button {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    background: var(--maroon);
+    color: var(--parchment);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  button:hover { background: #7a1620; }
+  button.ghost {
+    background: transparent;
+    color: var(--maroon);
+    border: 1px solid var(--maroon);
+    padding: 9px 16px;
+  }
+  button.ghost:hover { background: rgba(92,15,22,0.08); }
+  .feedback { min-height: 26px; font-size: 15px; margin-top: 6px; font-weight: 600; }
+  .feedback.correct { color: var(--success); }
+  .feedback.wrong { color: var(--danger); }
+  .hint {
+    display: none;
+    background: #fbf3df;
+    border: 1px dashed var(--bronze);
+    padding: 10px 14px;
+    font-size: 15px;
+    margin-top: 10px;
+    color: #4a3a26;
+  }
+  .hint.show { display: block; }
+  .code-reveal {
+    margin-top: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    color: var(--bronze);
+  }
+
+  /* ---------- VAULT OPEN / BONUS ---------- */
+  .vault-open {
+    display: none;
+    text-align: center;
+    color: var(--parchment);
+    padding: 36px 20px;
+  }
+  .vault-open.show { display: block; }
+  .vault-open h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 34px;
+    color: var(--gold-bright);
+    margin-bottom: 10px;
+  }
+  .vault-code-final {
+    font-family: 'Cinzel', serif;
+    font-size: 40px;
+    letter-spacing: 0.2em;
+    color: var(--gold-bright);
+    margin: 14px 0 20px;
+  }
+  .bonus-section { display: none; }
+  .bonus-section.show { display: block; }
+  .bonus-tag {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--parchment);
+    background: var(--bronze);
+    padding: 3px 10px;
+    margin-bottom: 10px;
+  }
+  .journal {
+    width: 100%;
+    min-height: 90px;
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    padding: 12px;
+    border: 2px solid var(--bronze);
+    background: #fffdf6;
+    resize: vertical;
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    color: var(--gold-bright);
+    text-align: center;
+    font-size: 22px;
+    margin: 44px 0 20px;
+    letter-spacing: 0.06em;
+  }
+  .footer-note {
+    text-align: center;
+    color: #cbb98a;
+    font-size: 14px;
+    margin-top: 30px;
+  }
+  .print-btn-wrap { text-align: center; margin: 30px 0 10px; }
+
+  @media print {
+    body { background: white !important; }
+    .hero, .vault-open, .dial, .dial-caption, .footer-note, .print-btn-wrap { color: black !important; }
+    button, .hint { display: none !important; }
+    .chamber { break-inside: avoid; box-shadow: none; }
+  }
+  @media (max-width: 480px) {
+    .chamber { padding: 22px 18px 20px; }
+    .tumbler { width: 40px; height: 52px; font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <p class="eyebrow">GRINGOTTS WIZARDING BANK &middot; DIVISION DIVISION</p>
+  <h1>Vault 74034 Is Sealed</h1>
+  <p class="lede">Five chambers stand between you and the vault. Each one guards a single digit of the combination. Solve the division locked inside each chamber to earn your digit &mdash; get every digit, and the vault door opens.</p>
+  <div class="dial" id="dial">
+    <div class="tumbler" id="t0">?</div>
+    <div class="tumbler" id="t1">?</div>
+    <div class="tumbler" id="t2">?</div>
+    <div class="tumbler" id="t3">?</div>
+    <div class="tumbler" id="t4">?</div>
+  </div>
+  <p class="dial-caption">0 of 5 digits recovered</p>
+</div>
+
+<div class="wrap">
+
+  <!-- CHAMBER 1 -->
+  <div class="chamber" data-chamber="0">
+    <p class="chamber-num">CHAMBER I</p>
+    <h2>The Owlery</h2>
+    <p class="story">Hedwig's cousins are hungry, and the Owlery keeper needs your help portioning out the treats before the post owls leave for the evening rounds.</p>
+    <div class="problem">
+      A sack holds 1,284 grams of owl treats. Treats come in 6-gram bites or 12-gram bites. How many <em>more</em> 6-gram bites than 12-gram bites can be measured from the sack?
+    </div>
+    <div class="answer-row">
+      <input type="text" id="ans0" placeholder="Your answer">
+      <button onclick="checkChamber(0, ['107'])">Unlock Chamber</button>
+      <button class="ghost" onclick="toggleHint('hint0')">Need a hint?</button>
+    </div>
+    <div class="feedback" id="fb0"></div>
+    <div class="hint" id="hint0">First find how many 6-gram bites fit (1,284 &divide; 6), then how many 12-gram bites fit (1,284 &divide; 12). Subtract the two totals.</div>
+    <div class="code-reveal" id="code0"></div>
+  </div>
+
+  <!-- CHAMBER 2 -->
+  <div class="chamber" data-chamber="1">
+    <p class="chamber-num">CHAMBER II</p>
+    <h2>Snape's Potion Store</h2>
+    <p class="story">Professor Snape has decanted 7,140 mL of Polyjuice Potion and stormed off mid-lesson. Finish his partial-quotients division before he returns.</p>
+    <div class="problem">
+      Snape is pouring 7,140 mL of potion into vials that hold 35 mL each. How many full vials can he fill?
+      <div class="algo">     35 ) 7,140
+      &minus; 7,000    (35 &times; 200)
+      &nbsp;&nbsp;&nbsp;140
+      &nbsp;&minus; 140    (35 &times; 4)
+      &nbsp;&nbsp;&nbsp;&nbsp;0</div>
+    </div>
+    <div class="answer-row">
+      <input type="text" id="ans1" placeholder="Your answer">
+      <button onclick="checkChamber(1, ['204'])">Unlock Chamber</button>
+      <button class="ghost" onclick="toggleHint('hint1')">Need a hint?</button>
+    </div>
+    <div class="feedback" id="fb1"></div>
+    <div class="hint" id="hint1">Add the two partial quotients shown in the work: 200 + 4.</div>
+    <div class="code-reveal" id="code1"></div>
+  </div>
+
+  <!-- CHAMBER 3 -->
+  <div class="chamber" data-chamber="2">
+    <p class="chamber-num">CHAMBER III</p>
+    <h2>Ollivander's Wand Shop</h2>
+    <p class="story">Mr. Ollivander has 6,440 unicorn hairs to divide evenly among his wand-boxes. A rival apprentice named Heidi already tried &mdash; and got it wrong.</p>
+    <div class="problem">
+      6,440 unicorn hairs are divided evenly into 28 wand-boxes. How many hairs go in each box?<br><br>
+      Heidi answered <strong>23</strong>. She's off &mdash; by a whole extra zero! What's the correct number of hairs per box?
+    </div>
+    <div class="answer-row">
+      <input type="text" id="ans2" placeholder="Your answer">
+      <button onclick="checkChamber(2, ['230'])">Unlock Chamber</button>
+      <button class="ghost" onclick="toggleHint('hint2')">Need a hint?</button>
+    </div>
+    <div class="feedback" id="fb2"></div>
+    <div class="hint" id="hint2">Estimate first: 28 is close to 30, and 6,440 is close to 6,000. 6,000 &divide; 30 = 200 &mdash; so the answer should be in the hundreds, not the tens like Heidi's.</div>
+    <div class="code-reveal" id="code2"></div>
+  </div>
+
+  <!-- CHAMBER 4 -->
+  <div class="chamber" data-chamber="3">
+    <p class="chamber-num">CHAMBER IV</p>
+    <h2>Hagrid's Hut</h2>
+    <p class="story">Hagrid is feeding his Blast-Ended Skrewts and needs to split the beetle supply fairly &mdash; nobody wants an uneven Skrewt feeding time.</p>
+    <div class="problem">
+      Hagrid divides 1,696 beetles evenly among 32 Skrewts. Write a division equation and find how many beetles each Skrewt gets.
+    </div>
+    <div class="answer-row">
+      <input type="text" id="ans3" placeholder="Your answer">
+      <button onclick="checkChamber(3, ['53'])">Unlock Chamber</button>
+      <button class="ghost" onclick="toggleHint('hint3')">Need a hint?</button>
+    </div>
+    <div class="feedback" id="fb3"></div>
+    <div class="hint" id="hint3">1,696 &divide; 32 = ? Try 32 &times; 50 first, then see what's left over.</div>
+    <div class="code-reveal" id="code3"></div>
+  </div>
+
+  <!-- CHAMBER 5 -->
+  <div class="chamber" data-chamber="4">
+    <p class="chamber-num">CHAMBER V</p>
+    <h2>The Room of Requirement</h2>
+    <p class="story">The Room has conjured a locked chest of 9,216 enchanted Galleons. Half were already claimed by students before you arrived.</p>
+    <div class="problem">
+      Of the 9,216 Galleons, exactly half have already been claimed. Each spellbook in the room's library costs 12 Galleons. How many spellbooks can still be purchased with what's left?
+    </div>
+    <div class="answer-row">
+      <input type="text" id="ans4" placeholder="Your answer">
+      <button onclick="checkChamber(4, ['384'])">Unlock Chamber</button>
+      <button class="ghost" onclick="toggleHint('hint4')">Need a hint?</button>
+    </div>
+    <div class="feedback" id="fb4"></div>
+    <div class="hint" id="hint4">First find half of 9,216 &mdash; that's what's left. Then divide that amount by 12.</div>
+    <div class="code-reveal" id="code4"></div>
+  </div>
+
+  <!-- VAULT OPEN -->
+  <div class="vault-open" id="vaultOpen">
+    <h2>The Vault Creaks Open</h2>
+    <p>Every chamber sealed. The combination was:</p>
+    <div class="vault-code-final">7 &ndash; 4 &ndash; 0 &ndash; 3 &ndash; 4</div>
+    <p>Well done, apprentice. Two side-passages remain unexplored if you'd like extra treasure &mdash; and Dumbledore has left you a final page for your Pensieve below.</p>
+  </div>
+
+  <!-- BONUS SECTION -->
+  <div class="bonus-section" id="bonusSection">
+    <p class="section-title">Bonus Vaults</p>
+
+    <div class="chamber" data-chamber="bonusA">
+      <p class="chamber-num">SIDE VAULT A</p>
+      <h2>Newt Scamander's Trunk</h2>
+      <p class="story">Newt's magically-expanded trunk is a rectangular prism packed with creature supplies.</p>
+      <div class="problem">
+        The trunk has a volume of 672 cubic inches and a height of 16 inches. Use the table to estimate, then find the exact area of its base, in square inches.
+        <br><br>
+        <table style="border-collapse:collapse; font-size:15px;">
+          <tr>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">10</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">20</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">30</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">40</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">50</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">60</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">160</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">320</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">480</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">640</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">800</td>
+            <td style="border:1px solid #8a5a2b; padding:4px 10px;">960</td>
+          </tr>
+        </table>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="ansA" placeholder="Your answer">
+        <button onclick="checkBonus('A', ['42'])">Check Answer</button>
+        <button class="ghost" onclick="toggleHint('hintA')">Need a hint?</button>
+      </div>
+      <div class="feedback" id="fbA"></div>
+      <div class="hint" id="hintA">The area of the base &times; height = volume. So base area = 672 &divide; 16. The table shows it should land between 40 and 50.</div>
+    </div>
+
+    <div class="chamber" data-chamber="bonusB">
+      <p class="chamber-num">SIDE VAULT B</p>
+      <h2>Dumbledore's Army</h2>
+      <p class="story">The D.A. is organizing its members into practice groups for the next meeting.</p>
+      <div class="problem">
+        There are 8 sections of the D.A., with 21 members in each section.<br><br>
+        <strong>Part A:</strong> What is the total number of D.A. members?<br>
+        <strong>Part B:</strong> If members are split into groups of 12, how many groups will there be?<br>
+        <strong>Part C:</strong> How many fewer members would be in each group if there were 24 groups instead?
+      </div>
+      <div class="answer-row">
+        <label>A:</label><input type="text" id="ansB1" placeholder="total" style="width:80px;">
+        <label>B:</label><input type="text" id="ansB2" placeholder="groups" style="width:80px;">
+        <label>C:</label><input type="text" id="ansB3" placeholder="fewer" style="width:80px;">
+        <button onclick="checkBonusB()">Check Answers</button>
+      </div>
+      <div class="feedback" id="fbB"></div>
+    </div>
+
+    <p class="section-title">Pensieve Journal</p>
+    <div class="chamber">
+      <p class="chamber-num">FINAL REFLECTION</p>
+      <h2>Leave a Memory Behind</h2>
+      <p class="story">Before you leave Gringotts, pour one last thought into the Pensieve for the next apprentice who visits this vault.</p>
+      <div class="problem">Explain what you would do first to divide 1,260 by 28, and why that would be your first step.</div>
+      <textarea class="journal" placeholder="Write your thinking here..."></textarea>
+    </div>
+  </div>
+
+  <div class="print-btn-wrap">
+    <button class="ghost" onclick="window.print()" style="color:#f0e6d0; border-color:#cbb98a;">Print This Page</button>
+  </div>
+  <p class="footer-note">Unit 1, Lesson 5, Session 5 &middot; Dividing Multi-Digit Numbers</p>
+</div>
+
+<script>
+const codeDigits = ['7','4','0','3','4'];
+let solvedCount = 0;
+
+function normalize(s) {
+  return s.trim().replace(/[,$\s]/g, '');
+}
+
+function checkChamber(idx, accepted) {
+  const input = document.getElementById('ans' + idx);
+  const fb = document.getElementById('fb' + idx);
+  const chamberEl = document.querySelector('[data-chamber="' + idx + '"]');
+  const val = normalize(input.value);
+  if (accepted.includes(val)) {
+    fb.textContent = 'Correct! The chamber seals with a satisfying click.';
+    fb.className = 'feedback correct';
+    if (!chamberEl.classList.contains('solved')) {
+      chamberEl.classList.add('solved');
+      document.getElementById('code' + idx).textContent = 'Vault digit revealed: ' + codeDigits[idx];
+      const tumbler = document.getElementById('t' + idx);
+      tumbler.textContent = codeDigits[idx];
+      tumbler.classList.add('filled');
+      solvedCount++;
+      document.querySelector('.dial-caption').textContent = solvedCount + ' of 5 digits recovered';
+      if (solvedCount === 5) {
+        document.getElementById('vaultOpen').classList.add('show');
+        document.getElementById('bonusSection').classList.add('show');
+      }
+    }
+  } else {
+    fb.textContent = 'Not quite. Check your division and try again.';
+    fb.className = 'feedback wrong';
+  }
+}
+
+function checkBonus(id, accepted) {
+  const input = document.getElementById('ans' + id);
+  const fb = document.getElementById('fb' + id);
+  const val = normalize(input.value);
+  if (accepted.includes(val)) {
+    fb.textContent = 'Correct! Treasure claimed.';
+    fb.className = 'feedback correct';
+  } else {
+    fb.textContent = 'Not quite yet. Try again.';
+    fb.className = 'feedback wrong';
+  }
+}
+
+function checkBonusB() {
+  const a = normalize(document.getElementById('ansB1').value);
+  const b = normalize(document.getElementById('ansB2').value);
+  const c = normalize(document.getElementById('ansB3').value);
+  const fb = document.getElementById('fbB');
+  const correct = a === '168' && b === '14' && c === '5';
+  if (correct) {
+    fb.textContent = 'All three correct! Treasure claimed.';
+    fb.className = 'feedback correct';
+  } else {
+    let msg = [];
+    if (a !== '168') msg.push('Part A');
+    if (b !== '14') msg.push('Part B');
+    if (c !== '5') msg.push('Part C');
+    fb.textContent = 'Check ' + msg.join(', ') + ' and try again.';
+    fb.className = 'feedback wrong';
+  }
+}
+
+function toggleHint(id) {
+  document.getElementById(id).classList.toggle('show');
+}
+</script>
+
+</body>
+</html>
